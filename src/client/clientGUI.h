@@ -3,14 +3,12 @@
 #define _MYNET_CLIENT_CLIENTGUI_H_
 
 #include "client.h"
-#include "../server/serverGUI.h"
 
 #include <raylib.h>
 #include <imgui.h>
 #include <rlImGui.h>
 
 #include <thread>
-#include <atomic>
 #include <string>
 
 namespace mynet {
