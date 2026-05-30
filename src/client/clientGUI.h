@@ -3,7 +3,6 @@
 #define _MYNET_CLIENT_CLIENTGUI_H_
 
 #include "client.h"
-#include "../server/serverGUI.h"
 
 #include <raylib.h>
 #include <imgui.h>

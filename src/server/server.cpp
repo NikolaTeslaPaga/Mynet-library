@@ -120,7 +120,7 @@ void Server::Disconnect(ID id, uint32_t data) {
 }
 void Server::DisconnectAll(uint32_t data) {
     for (const auto& [_, peer] : mPeers)
-       enet_peer_disconnect(peer, data);
+        enet_peer_disconnect(peer, data);
 }
 
 
