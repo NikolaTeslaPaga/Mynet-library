@@ -110,7 +110,7 @@ namespace mynet {
         return false;
     }
     void Client::Disconnect(uint32_t data) {
-        if (!mServerPeer)
+        if (!connected)
             return;
 
         enet_peer_disconnect(mServerPeer, data);
@@ -172,6 +172,7 @@ namespace mynet {
         }
 
         case ENET_EVENT_TYPE_DISCONNECT: {
+            connected = false;
             mServerPeer = nullptr;
 
             if (onDisconnect)

@@ -119,8 +119,8 @@ void Server::Disconnect(ID id, uint32_t data) {
     enet_peer_disconnect(GetPeer(id), data);
 }
 void Server::DisconnectAll(uint32_t data) {
-    for (const auto &[_, peer] : mPeers)
-        enet_peer_disconnect(peer, data);
+    for (const auto& [_, peer] : mPeers)
+       enet_peer_disconnect(peer, data);
 }
 
 

@@ -24,3 +24,5 @@ target_include_directories(imgui PUBLIC
 target_link_libraries(imgui PUBLIC
     glfw
 )
+
+target_compile_definitions(imgui PUBLIC NO_FONT_AWESOME)

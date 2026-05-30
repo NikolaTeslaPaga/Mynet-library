@@ -5,7 +5,7 @@
 # /solution_folder
 #   /src
 #       main.cpp
-#   /thirdparty
+#   /thirdparty 
 #       /enet
 #       /glfw
 #       /imgui
