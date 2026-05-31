@@ -1,0 +1,79 @@
+name: Linux CMake Build CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            arch: x86_64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+
+    runs-on: ${{ matrix.os }}
+    
+    permissions:
+      contents: write
+
+    env:
+      BUILD_CONFIG: ${{ startsWith(github.ref, 'refs/tags/') && 'Release' || 'Debug' }}
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install GUI Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev xorg-dev
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIG }}
+      
+    - name: Build Server GUI
+      run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_CONFIG }} --target myservergui
+
+    - name: Build Client GUI
+      run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_CONFIG }} --target myclientgui
+
+    # -------------------------------------------------------------
+    # FILE RENAMING (Matches exact target pattern)
+    # -------------------------------------------------------------
+    - name: Rename Files to Match Target Convention
+      shell: bash
+      run: |
+        SUFFIX=""
+        if [ "${{ env.BUILD_CONFIG }}" = "Debug" ]; then SUFFIX="_debug"; fi
+        
+        # Formats: clientGUI_x86_64_debug or clientGUI_arm64
+        mv "${{github.workspace}}/build/myclientgui" "${{github.workspace}}/build/clientGUI_${{ matrix.arch }}${SUFFIX}"
+        mv "${{github.workspace}}/build/myservergui" "${{github.workspace}}/build/serverGUI_${{ matrix.arch }}${SUFFIX}"
+
+    # -------------------------------------------------------------
+    # RELEASES SECTOR
+    # -------------------------------------------------------------
+    - name: Create Rolling Release (On Every Push - DEBUG BUILD)
+      if: ${{ env.BUILD_CONFIG == 'Debug' }}
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: Latest Development Build (Debug)
+        prerelease: true
+        files: |
+          ${{github.workspace}}/build/serverGUI_${{ matrix.arch }}_debug
+          ${{github.workspace}}/build/clientGUI_${{ matrix.arch }}_debug
+
+    - name: Create Official Version Release (On Explicit Tag - RELEASE BUILD)
+      if: ${{ env.BUILD_CONFIG == 'Release' }}
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ${{github.workspace}}/build/serverGUI_${{ matrix.arch }}
+          ${{github.workspace}}/build/clientGUI_${{ matrix.arch }}
