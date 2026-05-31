@@ -14,10 +14,13 @@ Server::Server(Server&& other) noexcept
         mPeers(std::move(other.mPeers)),
         mPeerToID(std::move(other.mPeerToID)),
         mID(other.mID),
+
         onConnect(std::move(other.onConnect)),
         onDisconnect(std::move(other.onDisconnect)),
         onReceive(std::move(other.onReceive)) {
+
     other.mHost = nullptr;
+    other.running = false;
 }
 Server& Server::operator=(Server&& other) noexcept {
     if (this != &other) {
@@ -35,6 +38,7 @@ Server& Server::operator=(Server&& other) noexcept {
         onReceive = std::move(other.onReceive);
         
         other.mHost = nullptr;
+        other.running = false;
     }
     return *this;
 }
@@ -46,6 +50,7 @@ bool Server::Start() {
 
     mPeers.clear();
     mPeerToID.clear();
+    mID = 0;
 
 
     ENetAddress address{};
@@ -72,7 +77,6 @@ bool Server::Start() {
 bool Server::Stop() {
     if (!running)
         return false;
-    running = false;
     DisconnectAll();
 
     std::this_thread::sleep_for(
@@ -83,7 +87,11 @@ bool Server::Stop() {
         enet_host_destroy(mHost);
         mHost = nullptr;
     }
+
+    running = false;
     mPeers.clear();
+    mPeerToID.clear();
+    return true;
 }
 
 
@@ -104,6 +112,8 @@ bool Server::Poll(uint32_t timeoutMs) {
 
 bool Server::SendTo(ID id, const void* data, size_t size, uint8_t channel, bool reliable) {
     if (!mPeers.contains(id))
+        return false;
+    if (mPeers[id]->state != ENET_PEER_STATE_CONNECTED)
         return false;
     ENetPacket* packet = enet_packet_create(data, size, reliable ? ENET_PACKET_FLAG_RELIABLE : 0);
     return enet_peer_send(GetPeer(id), channel, packet) == 0;

@@ -1,4 +1,4 @@
-#define WIN32_LEAN_AND_MEAN
+﻿#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #define NOGDI
 #define NOUSER
@@ -29,8 +29,6 @@ int main() {
 
 	while (!WindowShouldClose()) {
 
-		gui.Poll();
-
 		x = GetScreenWidth();
 		y = GetScreenHeight();
 
@@ -42,19 +40,19 @@ int main() {
 				isDragging = false;
 			}
 		}
-
+	
 
 		BeginDrawing();
 		ClearBackground(BLANK);
 		rlImGuiBegin();
 
 
-
+		
 		gui.Render(x, y, isDragging, dragOffset);
+        
 
-
-		rlImGuiEnd();
-		EndDrawing();
+        rlImGuiEnd();
+        EndDrawing();
 	}
 
 	rlImGuiShutdown();

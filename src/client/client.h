@@ -86,13 +86,13 @@ namespace mynet {
 
 #pragma region Callbacks
 
-        std::function<void()> onConnect = [&]() {
+        std::function<void()> onConnect = [this]() {
             std::cout << "Cliented connected to server!\n";
         };
-        std::function<void()> onDisconnect = [&]() {
+        std::function<void()> onDisconnect = [this]() {
             std::cout << "Cliented disconnected from server!\n";
         };
-        std::function<void(const PacketView&)> onReceive = [&](const PacketView& packet) {
+        std::function<void(const PacketView&)> onReceive = [this](const PacketView& packet) {
             std::cout << "Packet received from server!\n";
             std::cout << std::string((char*)packet.data, packet.size) << '\n';
         };
