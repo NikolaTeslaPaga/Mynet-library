@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    
+
     env:
       BUILD_CONFIG: ${{ startsWith(github.ref, 'refs/tags/') && 'Release' || 'Debug' }}
 
@@ -19,7 +19,6 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Configure CMake
-      # We dynamically pass either Debug or Release here
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIG }}
       
     - name: Build Server GUI
@@ -27,6 +26,16 @@ jobs:
 
     - name: Build Client GUI
       run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_CONFIG }} --target clientGUI
+
+    # -------------------------------------------------------------
+    # FILE RENAMING (Only runs on normal branch pushes)
+    # -------------------------------------------------------------
+    - name: Rename Files with Debug Suffix
+      if: "!startsWith(github.ref, 'refs/tags/')"
+      shell: pwsh
+      run: |
+        Move-Item "${{github.workspace}}/build/Debug/serverGUI.exe" "${{github.workspace}}/build/Debug/serverGUI_debug.exe"
+        Move-Item "${{github.workspace}}/build/Debug/clientGUI.exe" "${{github.workspace}}/build/Debug/clientGUI_debug.exe"
 
     # -------------------------------------------------------------
     # RELEASES SECTOR
@@ -40,8 +49,8 @@ jobs:
         name: Latest Development Build (Debug)
         prerelease: true
         files: |
-          ${{github.workspace}}/build/Debug/serverGUI.exe
-          ${{github.workspace}}/build/Debug/clientGUI.exe
+          ${{github.workspace}}/build/Debug/serverGUI_debug.exe
+          ${{github.workspace}}/build/Debug/clientGUI_debug.exe
 
     - name: Create Official Version Release (On Explicit Tag - RELEASE BUILD)
       if: startsWith(github.ref, 'refs/tags/')
