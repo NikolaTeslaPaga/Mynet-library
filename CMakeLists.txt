@@ -5,6 +5,8 @@
 # /solution_folder
 #   /src
 #       /server
+#           joinCode.h
+#           joinCode.cpp
 #           server.h
 #           server.cpp
 #           serverGUI.h
@@ -27,19 +29,6 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-project(mynet)
-project(myservergui)
-project(myhostgui)
-
-if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-
-set(ALL_TARGETS 
-    mynet
-    myservergui
-    myclientgui
-)
 # -----------------------------
 # Language standards
 # -----------------------------
@@ -62,42 +51,39 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# -----------------------------
-# GLFW options
-# -----------------------------
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 
-# -----------------------------
-# ENet options
-# -----------------------------
-set(ENET_STATIC ON CACHE BOOL "" FORCE)
-set(ENET_SHARED OFF CACHE BOOL "" FORCE)
-set(ENET_TEST OFF CACHE BOOL "" FORCE)
+project(mynet)
 
-# -----------------------------
-# Raylib options
-# -----------------------------
-set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
+if(MSVC)
 
-# -----------------------------
-# Dependencies
-# -----------------------------
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+    add_compile_definitions(
+        _CRT_SECURE_NO_WARNINGS
+        _WINSOCK_DEPRECATED_NO_WARNINGS
+    )
+
+endif()
+
+set(ALL_TARGETS 
+    #mynet
+    myservergui
+    myclientgui
+)
+
 add_subdirectory(thirdparty)
-
 
 # -----------------------------
 # Main executable
 # -----------------------------
-add_executable(mynet
-    src/mynet.cpp
-    src/server/server.cpp
-    src/client/client.cpp
-    src/server/joinCode.cpp
-)
+
+#add_executable(mynet
+#    src/mynet.cpp
+#    src/server/server.cpp
+#    src/client/client.cpp
+#    src/server/joinCode.cpp
+#)
+
 add_executable(myservergui
     src/server/serverGUI.cpp
     src/server/server.cpp
@@ -136,13 +122,14 @@ endforeach()
 foreach(target IN LISTS ALL_TARGETS)
     target_link_libraries(${target}
         PRIVATE
-            #glfw
+            glfw
             raylib
             imgui
             enet
             rlimgui
     )
 endforeach()
+
 
 # -----------------------------
 # Windows-specific system libs
@@ -159,21 +146,6 @@ if(WIN32)
     endforeach()
 endif()
 
-# -----------------------------
-# Linux system libs
-# -----------------------------
-if(UNIX AND NOT APPLE)
-    foreach(target IN LISTS ALL_TARGETS)
-        target_link_libraries(${target}
-            PRIVATE
-                m
-                pthread
-                dl
-                rt
-                X11
-        )
-        endforeach()
-endif()
 
 # -----------------------------
 # Compiler warnings
@@ -187,6 +159,7 @@ else()
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic)
     endforeach()
 endif()
+
 
 # -----------------------------
 # Visual Studio startup project
