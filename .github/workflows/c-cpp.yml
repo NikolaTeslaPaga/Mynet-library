@@ -22,10 +22,10 @@ jobs:
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIG }}
       
     - name: Build Server GUI
-      run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_CONFIG }} --target serverGUI
+      run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_CONFIG }} --target myservergui
 
     - name: Build Client GUI
-      run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_CONFIG }} --target clientGUI
+      run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_CONFIG }} --target myclientgui
 
     # -------------------------------------------------------------
     # FILE RENAMING (Only runs on normal branch pushes)
