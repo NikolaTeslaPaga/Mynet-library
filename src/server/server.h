@@ -134,7 +134,7 @@ public:
 		std::cout << "Recieved from " << id << ":\n";
 		std::cout << msg << '\n';
 
-		//const char* confirmation = "Message Received!";
+		//const char* confirmation = "Message Received! ";
 		//SendTo(id, confirmation, strlen(confirmation) + 1);
 
 		std::string broadcast = std::format("User {}: {}", id, msg);
