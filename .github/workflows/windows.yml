@@ -34,8 +34,8 @@ jobs:
       if: ${{ env.BUILD_CONFIG == 'Debug' }}
       shell: pwsh
       run: |
-        Move-Item -Path "${{github.workspace}}/build/Debug/myclientgui.exe" -Destination "${{github.workspace}}/build/Debug/clientGUI_debug.exe" -Force
-        Move-Item -Path "${{github.workspace}}/build/Debug/myservergui.exe" -Destination "${{github.workspace}}/build/Debug/serverGUI_debug.exe" -Force
+        Move-Item -Path "${{github.workspace}}/build/bin/Debug/myclientgui.exe" -Destination "${{github.workspace}}/build/bin/Debug/clientGUI_debug.exe" -Force
+        Move-Item -Path "${{github.workspace}}/build/bin/Debug/myservergui.exe" -Destination "${{github.workspace}}/build/bin/Debug/serverGUI_debug.exe" -Force
         
     # -------------------------------------------------------------
     # FILE RENAMING (Only runs on normal branch pushes)
@@ -44,8 +44,8 @@ jobs:
       if: ${{ env.BUILD_CONFIG == 'Release' }}
       shell: pwsh
       run: |
-        Move-Item -Path "${{github.workspace}}/build/Release/myclientgui.exe" -Destination "${{github.workspace}}/build/Release/clientGUI.exe" -Force
-        Move-Item -Path "${{github.workspace}}/build/Release/myservergui.exe" -Destination "${{github.workspace}}/build/Release/serverGUI.exe" -Force
+        Move-Item -Path "${{github.workspace}}/build/bin/Release/myclientgui.exe" -Destination "${{github.workspace}}/build/bin/Release/clientGUI.exe" -Force
+        Move-Item -Path "${{github.workspace}}/build/bin/Release/myservergui.exe" -Destination "${{github.workspace}}/build/bin/Release/serverGUI.exe" -Force
 
     # -------------------------------------------------------------
     # RELEASES SECTOR
@@ -59,13 +59,13 @@ jobs:
         name: Latest Development Build (Debug)
         prerelease: true
         files: |
-          ${{github.workspace}}/build/Debug/serverGUI_debug.exe
-          ${{github.workspace}}/build/Debug/clientGUI_debug.exe
+          ${{github.workspace}}/build/bin/Debug/serverGUI_debug.exe
+          ${{github.workspace}}/build/bin/Debug/clientGUI_debug.exe
 
     - name: Create Official Version Release (On Explicit Tag - RELEASE BUILD)
       if: ${{ env.BUILD_CONFIG == 'Release' }}
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          ${{github.workspace}}/build/Release/serverGUI.exe
-          ${{github.workspace}}/build/Release/clientGUI.exe
+          ${{github.workspace}}/build/bin/Release/serverGUI.exe
+          ${{github.workspace}}/build/bin/Release/clientGUI.exe
