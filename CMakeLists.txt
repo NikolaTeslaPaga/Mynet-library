@@ -31,6 +31,10 @@ project(mynet)
 project(myservergui)
 project(myhostgui)
 
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 set(ALL_TARGETS 
     mynet
     myservergui
