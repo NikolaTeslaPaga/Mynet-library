@@ -31,18 +31,28 @@ jobs:
     # FILE RENAMING (Only runs on normal branch pushes)
     # -------------------------------------------------------------
     - name: Rename Files with Debug Suffix
-      if: "!startsWith(github.ref, 'refs/tags/')"
+      if: ${{ env.BUILD_CONFIG == 'Debug' }}
       shell: pwsh
       run: |
-        Move-Item "${{github.workspace}}/build/Debug/serverGUI.exe" "${{github.workspace}}/build/Debug/serverGUI_debug.exe"
-        Move-Item "${{github.workspace}}/build/Debug/clientGUI.exe" "${{github.workspace}}/build/Debug/clientGUI_debug.exe"
+        Move-Item -Path "${{github.workspace}}/build/Debug/myclientgui.exe" -Destination "${{github.workspace}}/build/Debug/clientGUI_debug.exe" -Force
+        Move-Item -Path "${{github.workspace}}/build/Debug/myservergui.exe" -Destination "${{github.workspace}}/build/Debug/serverGUI_debug.exe" -Force
+        
+    # -------------------------------------------------------------
+    # FILE RENAMING (Only runs on normal branch pushes)
+    # -------------------------------------------------------------
+    - name: Rename Files with Debug Suffix
+      if: ${{ env.BUILD_CONFIG == 'Release' }}
+      shell: pwsh
+      run: |
+        Move-Item -Path "${{github.workspace}}/build/Release/myclientgui.exe" -Destination "${{github.workspace}}/build/Release/clientGUI.exe" -Force
+        Move-Item -Path "${{github.workspace}}/build/Release/myservergui.exe" -Destination "${{github.workspace}}/build/Release/serverGUI.exe" -Force
 
     # -------------------------------------------------------------
     # RELEASES SECTOR
     # -------------------------------------------------------------
 
     - name: Create Rolling Release (On Every Push - DEBUG BUILD)
-      if: "!startsWith(github.ref, 'refs/tags/')"
+      if: ${{ env.BUILD_CONFIG == 'Debug' }}
       uses: softprops/action-gh-release@v2
       with:
         tag_name: latest
@@ -53,7 +63,7 @@ jobs:
           ${{github.workspace}}/build/Debug/clientGUI_debug.exe
 
     - name: Create Official Version Release (On Explicit Tag - RELEASE BUILD)
-      if: startsWith(github.ref, 'refs/tags/')
+      if: ${{ env.BUILD_CONFIG == 'Release' }}
       uses: softprops/action-gh-release@v2
       with:
         files: |
