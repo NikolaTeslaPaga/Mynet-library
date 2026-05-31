@@ -18,6 +18,8 @@ namespace mynet {
             onConnect(std::move(other.onConnect)),
             onDisconnect(std::move(other.onDisconnect)),
             onReceive(std::move(other.onReceive)) {
+        other.started = false;
+        other.connected = false;
         other.mHost = nullptr;
         other.mServerPeer = nullptr;
     }
@@ -35,6 +37,8 @@ namespace mynet {
             onDisconnect = std::move(other.onDisconnect);
             onReceive = std::move(other.onReceive);
 
+            other.started = false;
+            other.connected = false;
             other.mHost = nullptr;
             other.mServerPeer = nullptr;
         }
@@ -128,15 +132,17 @@ namespace mynet {
 
         mServerPeer = nullptr;
         connected = false;
+
+        if (onDisconnect)
+            onDisconnect();
     }
     bool Client::IsConnected() const {
         return connected && mServerPeer && mServerPeer->state == ENET_PEER_STATE_CONNECTED;
     }
 
     bool Client::Poll(uint32_t timeoutMs) {
-        if (!connected)
+        if (!mHost)
             return false;
-        assert(mHost);
 
         ENetEvent event;
         while (enet_host_service(mHost, &event, timeoutMs) > 0)
@@ -144,7 +150,7 @@ namespace mynet {
         return true;
     }
     bool Client::Send(const void* data, size_t size, uint8_t channel, bool reliable) {
-        if (!connected)
+        if (!IsConnected())
             return false;
 
         ENetPacket* packet = enet_packet_create(data, size, reliable ? ENET_PACKET_FLAG_RELIABLE : 0);

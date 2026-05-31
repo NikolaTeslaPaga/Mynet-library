@@ -4,7 +4,19 @@
 #
 # /solution_folder
 #   /src
-#       main.cpp
+#       /server
+#           server.h
+#           server.cpp
+#           serverGUI.h
+#           serverGUI.cpp
+#       /client
+#           client.h
+#           client.cpp
+#           clientGUI.h
+#           clientGUI.cpp
+#       enetInitializer.h
+#       mynet.h
+#       mynet.cpp
 #   /thirdparty
 #       /enet
 #       /glfw
@@ -77,17 +89,20 @@ add_subdirectory(thirdparty)
 # Main executable
 # -----------------------------
 add_executable(mynet
-    src/main.cpp
+    src/mynet.cpp
     src/server/server.cpp
     src/client/client.cpp
+    src/server/joinCode.cpp
 )
 add_executable(myservergui
     src/server/serverGUI.cpp
     src/server/server.cpp
+    src/server/joinCode.cpp
 )
 add_executable(myclientgui
     src/client/clientGUI.cpp
     src/client/client.cpp
+    src/server/joinCode.cpp
 )
 
 if(MSVC)

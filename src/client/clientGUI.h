@@ -3,6 +3,7 @@
 #define _MYNET_CLIENT_CLIENTGUI_H_
 
 #include "client.h"
+#include "server/joinCode.h"
 
 #include <raylib.h>
 #include <imgui.h>
@@ -18,7 +19,8 @@ namespace mynet {
 
         explicit ClientGUI(Client& client)
             : client(client) {
-            client.onReceive = [&](const Client::PacketView& packet) {
+            clientOnReceive = client.onReceive;
+            client.onReceive = [this](const Client::PacketView& packet) {
 
                 receivedMessages.push_back(
                     std::string(
@@ -30,6 +32,7 @@ namespace mynet {
         }
 
         ~ClientGUI() {
+            client.onReceive = clientOnReceive;
             Disconnect();
         }
 
@@ -61,9 +64,12 @@ namespace mynet {
 
         bool ConnectWithCode(const std::string& code) {
 
-            auto [ip, decodedPort] = ServerGUI::DecodeJoinCode(code);
+            if (!joinCode::CheckCode(code, codeConfig))
+                return false;
+            auto [ip, decodedPort] = joinCode::DecodeJoinCode(code, codeConfig);
 
-            strcpy_s(ipBuffer, ip.c_str());
+            std::strncpy(ipBuffer, ip.c_str(), sizeof(ipBuffer) - 1);
+            ipBuffer[sizeof(ipBuffer) - 1] = '\0';
             port = decodedPort;
 
             return Connect();
@@ -281,6 +287,8 @@ namespace mynet {
 
     private:
 
+        std::function<void(const mynet::Client::PacketView& packet)> clientOnReceive;
+
         Client& client;
         Client::Config config{};
 
@@ -290,6 +298,7 @@ namespace mynet {
 
         uint16_t port = 1234;
 
+        joinCode::Config codeConfig{};
         char ipBuffer[64] = "127.0.0.1";
 
         char joinCodeBuffer[128] = "";

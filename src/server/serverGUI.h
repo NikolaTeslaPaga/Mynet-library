@@ -3,6 +3,7 @@
 #define _MYNET_SERVER_SERVERGUI_H_
 
 #include "server.h"
+#include "joinCode.h"
 
 #include <raylib.h>
 #include <imgui.h>
@@ -35,7 +36,7 @@ namespace mynet {
 				return false;
 
 			running = true;
-			joinCode = EncodeJoinCode(ipBuffer, config.port);
+			joinCode = joinCode::EncodeJoinCode(ipBuffer, config.port, codeConfig);
 
 			return true;
 		}
@@ -178,64 +179,12 @@ namespace mynet {
 				server.Poll(timeOutMs);
 		}
 
-	public:
-
-		static std::string IntToCode(uint64_t v) {
-			if (v == 0)
-				return "0";
-			std::string s;
-			while (v > 0) {
-				s.push_back(digits[v % base]);
-				v /= base;
-			}
-			std::reverse(s.begin(), s.end());
-			return s;
-		}
-		static uint64_t CodeToInt(const std::string& code) {
-			uint64_t v = 0;
-
-			for (char c : code) {
-				size_t pos = digits.find(c);
-				if (pos == std::string::npos)
-					throw std::runtime_error("Invalid join code character");
-
-				v = v * base + static_cast<uint64_t>(pos);
-			}
-
-			return v;
-		}
-
-		static std::string EncodeJoinCode(const std::string& ip, uint16_t port) {
-			ENetAddress addr;
-			enet_address_set_host(&addr, ip.c_str());
-			uint32_t ipInt = ntohl(addr.host);
-			uint64_t codeInt = (uint64_t(ipInt) << 16) | port;
-			return IntToCode(codeInt);
-		}
-
-		static std::pair<std::string, uint16_t> DecodeJoinCode(const std::string& code) {
-			uint64_t packed = CodeToInt(code);
-
-			uint16_t port = static_cast<uint16_t>(packed & 0xFFFF);
-			uint32_t ipInt = static_cast<uint32_t>(packed >> 16);
-
-			ENetAddress addr{};
-			addr.host = htonl(ipInt);
-
-			char ip[64];
-			enet_address_get_host_ip(&addr, ip, sizeof(ip));
-
-			return { std::string(ip), port };
-		}
-
 	private:
 
 		void ApplyConfig() {
 			server.ReConfig(config);
 		}
 
-		static inline const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		static inline const size_t base = digits.size();
 
 	private:
 		Server& server;
@@ -243,7 +192,8 @@ namespace mynet {
 
 		bool running = false;
 
-		std::string joinCode;
+		joinCode::Config codeConfig{};
+		std::string joinCode = std::string(codeConfig.base, '*');
 
 		char serverName[128] = "My Server!!!";
 		char ipBuffer[64] = "127.0.0.1";

@@ -3,7 +3,7 @@
 #define NOGDI
 #define NOUSER
 
-#include "enet_template.h"
+#include "enetInitializer.h"
 
 #include "client/clientGUI.h"
 

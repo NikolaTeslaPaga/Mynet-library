@@ -105,23 +105,23 @@ public:
 	// CALLBACKS
 	// ------------------------------
 
-	std::function<void(ID)> onConnect = [&](ID id) {
+	std::function<void(ID)> onConnect = [this](ID id) {
 		std::cout << "Client connected: " << id << '\n';
 
 		const char* msg = "Welcome!";
 		SendTo(id, msg, strlen(msg) + 1);
 
-		std::string broadcast = std::format("Say hello to nr {}", id);
+		std::string broadcast = std::format("Say hello to User {}", id);
 		Broadcast(broadcast.data(), broadcast.size() + 1);
 	};
-	std::function<void(ID)> onDisconnect = [&](ID id) {
+	std::function<void(ID)> onDisconnect = [this](ID id) {
 		std::cout << "Client disconnected: " << id << '\n';
 
-		std::string broadcast = std::format("Say goodbye to nr {}", id);
+		std::string broadcast = std::format("Say goodbye to User {}", id);
 		Broadcast(broadcast.data(), broadcast.size() + 1);
 	};
 	std::function<void(const PacketView&)> onReceive =
-		[&](const PacketView& packet) {
+		[this](const PacketView& packet) {
 
 		std::string msg(
 			reinterpret_cast<const char*>(packet.data),
@@ -133,9 +133,9 @@ public:
 		std::cout << msg << '\n';
 
 		const char* confirmation = "Message Received!";
-		SendTo(id, confirmation, strlen(confirmation) + 1);
+		//SendTo(id, confirmation, strlen(confirmation) + 1);
 
-		std::string broadcast = std::format("Received from {}: {}", id, msg);
+		std::string broadcast = std::format("User {}: {}", id, msg);
 		Broadcast(broadcast.data(), broadcast.size() + 1);
 	};
 
