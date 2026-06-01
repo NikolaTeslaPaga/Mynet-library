@@ -2,12 +2,15 @@
 #ifndef _MYNET_CLIENT_CLIENTGUI_H_
 #define _MYNET_CLIENT_CLIENTGUI_H_
 
+#include "enetGlobal.h"
 #include "client.h"
 #include "server/joinCode.h"
 
 #include <raylib.h>
 #include <imgui.h>
 #include <rlImGui.h>
+
+#include <misc/cpp/imgui_stdlib.h>
 
 #include <thread>
 #include <string>
@@ -50,7 +53,7 @@ namespace mynet {
 
             receivedMessages.clear();
 
-            bool success = client.Connect(ipBuffer, port);
+            bool success = client.Connect(ip, port);
 
             if (!success) {
                 client.Stop();
@@ -66,10 +69,9 @@ namespace mynet {
 
             if (!joinCode::CheckCode(code, codeConfig))
                 return false;
-            auto [ip, decodedPort] = joinCode::DecodeJoinCode(code, codeConfig);
+            auto [serverIp, decodedPort] = joinCode::DecodeJoinCode(code, codeConfig);
 
-            std::strncpy(ipBuffer, ip.c_str(), sizeof(ipBuffer) - 1);
-            ipBuffer[sizeof(ipBuffer) - 1] = '\0';
+            ip = serverIp;
             port = decodedPort;
 
             return Connect();
@@ -106,12 +108,12 @@ namespace mynet {
 
             ImGui::Begin("Client");
 
-            ImGui::InputText("IP", ipBuffer, sizeof(ipBuffer));
+            ImGui::InputText("IP", &ip);
             ImGui::InputScalar("Port", ImGuiDataType_U16, &port);
 
             ImGui::Separator();
 
-            ImGui::InputText("Join Code", joinCodeBuffer, sizeof(joinCodeBuffer));
+            ImGui::InputText("Join Code", &joinCode);
 
             if (!connected) {
 
@@ -121,7 +123,7 @@ namespace mynet {
                 ImGui::SameLine();
 
                 if (ImGui::Button("Connect With Code"))
-                    ConnectWithCode(joinCodeBuffer);
+                    ConnectWithCode(joinCode);
             }
             else {
 
@@ -198,12 +200,11 @@ namespace mynet {
 
             ImGui::Begin("Client", nullptr, flags);
 
-            ImGui::InputText("IP", ipBuffer, sizeof(ipBuffer));
+            ImGui::InputText("IP", &ip);
             ImGui::InputScalar("Port", ImGuiDataType_U16, &port);
 
             ImGui::Separator();
-
-            ImGui::InputText("Join Code", joinCodeBuffer, sizeof(joinCodeBuffer));
+            ImGui::InputText("Join Code", &joinCode);
 
             if (!connected) {
 
@@ -213,7 +214,7 @@ namespace mynet {
                 ImGui::SameLine();
 
                 if (ImGui::Button("Connect With Code"))
-                    ConnectWithCode(joinCodeBuffer);
+                    ConnectWithCode(joinCode);
             }
             else {
 
@@ -257,7 +258,7 @@ namespace mynet {
                 float(height) - 25
                 });
 
-            ImGui::Button("///", ImVec2(20, 20));
+            ImGui::Button("###resize", ImVec2(20, 20));
 
             if (ImGui::IsItemActive() &&
                 ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
@@ -299,9 +300,9 @@ namespace mynet {
         uint16_t port = 1234;
 
         joinCode::Config codeConfig{};
-        char ipBuffer[64] = "127.0.0.1";
+        std::string ip;
 
-        char joinCodeBuffer[128] = "";
+        std::string joinCode = std::string(12, '*');
 
     };
 

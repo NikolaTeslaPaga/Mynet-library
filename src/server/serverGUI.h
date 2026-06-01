@@ -2,6 +2,7 @@
 #ifndef _MYNET_SERVER_SERVERGUI_H_
 #define _MYNET_SERVER_SERVERGUI_H_
 
+#include "enetGlobal.h"
 #include "server.h"
 #include "joinCode.h"
 
@@ -35,8 +36,10 @@ namespace mynet {
 			if (!server.Start())
 				return false;
 
+
+
 			running = true;
-			joinCode = joinCode::EncodeJoinCode(ipBuffer, config.port, codeConfig);
+			joinCode = joinCode::EncodeJoinCode(ip, config.port, codeConfig);
 
 			return true;
 		}
@@ -62,6 +65,8 @@ namespace mynet {
 			ImGui::InputScalar("Packet Size", ImGuiDataType_U64, &config.packetSize);
 			ImGui::InputScalar("Buffer Size", ImGuiDataType_U64, &config.bufferSize);
 
+			ImGui::Text("IP: %s", ip.c_str());
+
 			if (!running) {
 				if (ImGui::Button("Start Server"))
 					Start();
@@ -78,6 +83,9 @@ namespace mynet {
 			if (running) {
 				ImGui::Text("Connected Clients: %zu", server.GetPeerAmount());
 				ImGui::Text("Join Code: %s", joinCode.c_str());
+				ImGui::SameLine();
+				if (ImGui::Button("Copy Code"))
+					ImGui::SetClipboardText(joinCode.c_str());
 
 
 				static char broadcastBuffer[1024] = "";
@@ -128,6 +136,8 @@ namespace mynet {
 			ImGui::InputScalar("Packet Size", ImGuiDataType_U64, &config.packetSize);
 			ImGui::InputScalar("Buffer Size", ImGuiDataType_U64, &config.bufferSize);
 
+			ImGui::Text("IP: %s", ip.c_str());
+
 			if (!running) {
 				if (ImGui::Button("Start Server"))
 					Start();
@@ -143,6 +153,9 @@ namespace mynet {
 			if (running) {
 				ImGui::Text("Connected Clients: %zu", server.GetPeerAmount());
 				ImGui::Text("Join Code: %s", joinCode.c_str());
+				ImGui::SameLine();
+				if (ImGui::Button("Copy code"))
+					ImGui::SetClipboardText(joinCode.c_str());
 
 
 				static char broadcastBuffer[1024] = "";
@@ -157,7 +170,7 @@ namespace mynet {
 
 
 			ImGui::SetCursorPos({ float(width) - 25, float(height) - 25 });
-			ImGui::Button("///", ImVec2(20, 20));
+			ImGui::Button("###resize", ImVec2(20, 20));
 
 			if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
 				ImVec2 delta = ImGui::GetIO().MouseDelta;
@@ -193,10 +206,10 @@ namespace mynet {
 		bool running = false;
 
 		joinCode::Config codeConfig{};
-		std::string joinCode = std::string(codeConfig.base, '*');
+		std::string joinCode = std::string(12, '*');
 
-		char serverName[128] = "My Server!!!";
-		char ipBuffer[64] = "127.0.0.1";
+		std::string serverName = "My Server!!!";
+		std::string ip = GetLocalIP();
 
 
 	};

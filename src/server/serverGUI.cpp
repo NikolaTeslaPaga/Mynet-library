@@ -3,7 +3,7 @@
 #define NOGDI
 #define NOUSER
 
-#include "enetInitializer.h"
+#include "enetGlobal.h"
 #include "server/serverGUI.h"
 #include <raylib.h>
 #include <imgui.h>

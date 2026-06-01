@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _ENET_INIT_H_
-#define _ENET_INIT_H_
+#ifndef _ENET_GLOBAL_H_
+#define _ENET_GLOBAL_H_
 
 #include <enet/enet.h>
 #include <stdexcept>
@@ -31,7 +31,24 @@ private:
     static inline std::atomic<size_t> refCount{ 0 };
 }; //class ENetInitializer
 
+std::string GetLocalIP() {
+    char hostName[256];
+
+    if (gethostname(hostName, sizeof(hostName)) != 0)
+        return "127.0.0.1";
+
+    ENetAddress addr;
+    if (enet_address_set_host(&addr, hostName) != 0)
+        return "127.0.0.1";
+
+    char ip[64];
+    enet_address_get_host_ip(&addr, ip, sizeof(hostName));
+    return ip;
+}
+
+
+
 } //namespace mynet
 
 
-#endif //_ENET_INIT_H
+#endif //_ENET_GLOBAL_H
