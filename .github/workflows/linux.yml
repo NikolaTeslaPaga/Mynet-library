@@ -32,7 +32,7 @@ jobs:
     - name: Install GUI Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev xorg-dev
+        sudo apt-get install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev xorg-dev libasound2-dev libpulse-dev
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIG }}
@@ -53,8 +53,8 @@ jobs:
         if [ "${{ env.BUILD_CONFIG }}" = "Debug" ]; then SUFFIX="_debug"; fi
         
         # Formats: clientGUI_x86_64_debug or clientGUI_arm64
-        mv "${{github.workspace}}/build/myclientgui" "${{github.workspace}}/build/clientGUI_${{ matrix.arch }}${SUFFIX}"
-        mv "${{github.workspace}}/build/myservergui" "${{github.workspace}}/build/serverGUI_${{ matrix.arch }}${SUFFIX}"
+        mv "${{github.workspace}}/build/bin/myclientgui" "${{github.workspace}}/build/bin/clientGUI_${{ matrix.arch }}${SUFFIX}"
+        mv "${{github.workspace}}/build/bin/myservergui" "${{github.workspace}}/build/bin/serverGUI_${{ matrix.arch }}${SUFFIX}"
 
     # -------------------------------------------------------------
     # RELEASES SECTOR
@@ -67,13 +67,13 @@ jobs:
         name: Latest Development Build (Debug)
         prerelease: true
         files: |
-          ${{github.workspace}}/build/serverGUI_${{ matrix.arch }}_debug
-          ${{github.workspace}}/build/clientGUI_${{ matrix.arch }}_debug
+          ${{github.workspace}}/build/bin/serverGUI_${{ matrix.arch }}_debug
+          ${{github.workspace}}/build/bin/clientGUI_${{ matrix.arch }}_debug
 
     - name: Create Official Version Release (On Explicit Tag - RELEASE BUILD)
       if: ${{ env.BUILD_CONFIG == 'Release' }}
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          ${{github.workspace}}/build/serverGUI_${{ matrix.arch }}
-          ${{github.workspace}}/build/clientGUI_${{ matrix.arch }}
+          ${{github.workspace}}/build/bin/serverGUI_${{ matrix.arch }}
+          ${{github.workspace}}/build/bin/clientGUI_${{ matrix.arch }}

@@ -29,6 +29,8 @@
 
 cmake_minimum_required(VERSION 3.20)
 
+project(mynet)
+
 # -----------------------------
 # Language standards
 # -----------------------------
@@ -51,9 +53,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
-
-
-project(mynet)
 
 if(MSVC)
 
@@ -147,6 +146,40 @@ if(WIN32)
     endforeach()
 endif()
 
+# -----------------------------
+# Linux-specific system libs
+# -----------------------------
+if(UNIX AND NOT APPLE)
+
+    foreach(target IN LISTS ALL_TARGETS)
+
+        target_link_libraries(${target} PRIVATE m pthread dl)
+
+    endforeach()
+
+endif()
+
+# -----------------------------
+# Apple-specific system libs
+# -----------------------------
+if(APPLE)
+
+    foreach(target IN LISTS ALL_TARGETS)
+
+        target_link_libraries(${target} PRIVATE
+
+            "-framework IOKit"
+
+            "-framework CoreAudio"
+
+            "-framework AudioToolbox"
+
+        )
+
+    endforeach()
+
+endif()
+
 
 # -----------------------------
 # Compiler warnings
@@ -165,9 +198,7 @@ endif()
 # -----------------------------
 # Visual Studio startup project
 # -----------------------------
-foreach(target IN LISTS ALL_TARGETS)
-    set_property(
-        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        PROPERTY VS_STARTUP_PROJECT ${target}
-    )
-endforeach()
+set_property(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    PROPERTY VS_STARTUP_PROJECT myservergui
+)

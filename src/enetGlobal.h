@@ -31,7 +31,7 @@ private:
     static inline std::atomic<size_t> refCount{ 0 };
 }; //class ENetInitializer
 
-std::string GetLocalIP() {
+inline std::string GetLocalIP() {
     char hostName[256];
 
     if (gethostname(hostName, sizeof(hostName)) != 0)

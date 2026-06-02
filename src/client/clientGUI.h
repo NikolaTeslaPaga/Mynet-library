@@ -204,7 +204,9 @@ namespace mynet {
             ImGui::InputScalar("Port", ImGuiDataType_U16, &port);
 
             ImGui::Separator();
-            ImGui::InputText("Join Code", &joinCode);
+            ImGui::InputTextWithHint("Join Code", "XXXX-XXXX-XXXX", & joinCode);
+
+            ImGui::Text("client IP: %s", clientIP.c_str());
 
             if (!connected) {
 
@@ -301,6 +303,7 @@ namespace mynet {
 
         joinCode::Config codeConfig{};
         std::string ip;
+        std::string clientIP = GetLocalIP();
 
         std::string joinCode = std::string(12, '*');
 

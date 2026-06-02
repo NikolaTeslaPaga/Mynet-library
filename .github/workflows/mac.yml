@@ -43,8 +43,8 @@ jobs:
         if [ "${{ env.BUILD_CONFIG }}" = "Debug" ]; then SUFFIX="_debug"; fi
         
         # Formats: clientGUI_mac_debug or clientGUI_mac
-        mv "${{github.workspace}}/build/myclientgui" "${{github.workspace}}/build/clientGUI_mac${SUFFIX}"
-        mv "${{github.workspace}}/build/myservergui" "${{github.workspace}}/build/serverGUI_mac${SUFFIX}"
+        mv "${{github.workspace}}/build/bin/myclientgui" "${{github.workspace}}/build/bin/clientGUI_mac${SUFFIX}"
+        mv "${{github.workspace}}/build/bin/myservergui" "${{github.workspace}}/build/bin/serverGUI_mac${SUFFIX}"
 
     # -------------------------------------------------------------
     # RELEASES SECTOR
@@ -57,13 +57,13 @@ jobs:
         name: Latest Development Build (Debug)
         prerelease: true
         files: |
-          ${{github.workspace}}/build/serverGUI_mac_debug
-          ${{github.workspace}}/build/clientGUI_mac_debug
+          ${{github.workspace}}/build/bin/serverGUI_mac_debug
+          ${{github.workspace}}/build/bin/clientGUI_mac_debug
 
     - name: Create Official Version Release (On Explicit Tag - RELEASE BUILD)
       if: ${{ env.BUILD_CONFIG == 'Release' }}
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          ${{github.workspace}}/build/serverGUI_mac
-          ${{github.workspace}}/build/clientGUI_mac
+          ${{github.workspace}}/build/bin/serverGUI_mac
+          ${{github.workspace}}/build/bin/clientGUI_mac

@@ -206,7 +206,7 @@ namespace mynet {
 		bool running = false;
 
 		joinCode::Config codeConfig{};
-		std::string joinCode = std::string(12, '*');
+		std::string joinCode;
 
 		std::string serverName = "My Server!!!";
 		std::string ip = GetLocalIP();
